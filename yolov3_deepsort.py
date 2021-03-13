@@ -127,27 +127,32 @@ class VideoTracker(object):
                              .format(end - start, 1 / (end - start), bbox_xywh.shape[0], len(outputs)))
 
 
+# 在command line 中输入 python yolov3_deepsort.py C:/MyFlie/xxx.mp4 --display
+# 这些 控制参数会存进sys.argv那里
+# argparse 会从sys.argv那里解析出参数
+# - 会被识别为 optional 例如 --config_detection --display
+# 剩下的参数会被认为是位置参数，必须出现
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("VIDEO_PATH", type=str)
-    parser.add_argument("--config_detection", type=str, default="./configs/yolov3.yaml")
+    parser.add_argument("VIDEO_PATH", type=str)  # 位置参数，必须写， 解析过后 VIDEO_PATH= 打入的路径
+    parser.add_argument("--config_detection", type=str, default="./configs/yolov3.yaml")  # optional 没有出现的话，就是默认
     parser.add_argument("--config_deepsort", type=str, default="./configs/deep_sort.yaml")
     # parser.add_argument("--ignore_display", dest="display", action="store_false", default=True)
-    parser.add_argument("--display", action="store_true")
+    parser.add_argument("--display", action="store_true")  # 出现 --display后，解析出来为 display = True
     parser.add_argument("--frame_interval", type=int, default=1)
     parser.add_argument("--display_width", type=int, default=800)
     parser.add_argument("--display_height", type=int, default=600)
     parser.add_argument("--save_path", type=str, default="./output/")
-    parser.add_argument("--cpu", dest="use_cuda", action="store_false", default=True)
+    parser.add_argument("--cpu", dest="use_cuda", action="store_false", default=True)  # 这个参数解析出来的名字为 use_cuda
     parser.add_argument("--camera", action="store", dest="cam", type=int, default="-1")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
+    os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
     args = parse_args()
-    cfg = get_config()
-    cfg.merge_from_file(args.config_detection)
-    cfg.merge_from_file(args.config_deepsort)
-
+    cfg = get_config()  # return 了 一个空class instance
+    cfg.merge_from_file(args.config_detection) # 调用自定义的method merge 别人的配置
+    cfg.merge_from_file(args.config_deepsort) # 配置文件路径为：./configs/yolov3.yaml
     with VideoTracker(cfg, args, video_path=args.VIDEO_PATH) as vdo_trk:
         vdo_trk.run()

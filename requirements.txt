@@ -13,7 +13,6 @@ lap==0.4.0
 mccabe==0.6.1
 more-itertools==8.2.0
 motmetrics==1.2.0
-numpy==1.18.2
 opencv-python==4.2.0.34
 openpyxl==3.0.3
 packaging==20.3
@@ -27,15 +26,13 @@ pyflakes==2.1.1
 pyparsing==2.4.7
 pytest==5.4.1
 pytest-benchmark==3.2.3
-python-dateutil==2.8.1
 pytz==2019.3
 PyYAML==5.3.1
 scikit-learn==0.22.2.post1
 scipy==1.4.1
-six==1.14.0
+six==1.15.0
 sklearn==0.0
-torch==1.4.0
-torchvision==0.5.0
+torch==1.7.1
 Vizer==0.1.5
 wcwidth==0.1.9
 xmltodict==0.12.0
