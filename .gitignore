@@ -1,6 +1,7 @@
 # Folders
 __pycache__/
 build/
+dataset
 *.egg-info
 
 

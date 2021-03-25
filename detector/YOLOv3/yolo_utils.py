@@ -164,9 +164,10 @@ def get_all_boxes(output, conf_thresh, num_classes, only_objectness=1, validatio
     batchsize = output[0]['x'].data.size(0)
 
     all_boxes = []
+    # 会做 3 次
     for i in range(len(output)):
         pred, anchors, num_anchors = output[i]['x'].data, output[i]['a'], output[i]['n'].item()
-        boxes = get_region_boxes(pred, conf_thresh, num_classes, anchors, num_anchors, \
+        boxes = get_region_boxes(pred, conf_thresh, num_classes, anchors, num_anchors,
                                  only_objectness=only_objectness, validation=validation, use_cuda=use_cuda)
 
         all_boxes.append(boxes)
@@ -175,16 +176,17 @@ def get_all_boxes(output, conf_thresh, num_classes, only_objectness=1, validatio
 
 def get_region_boxes(output, obj_thresh, num_classes, anchors, num_anchors, only_objectness=1, validation=False,
                      use_cuda=True):
+    # output = x : tensor[1,255,13,13]
     device = torch.device("cuda" if use_cuda else "cpu")
     anchors = anchors.to(device)
     anchor_step = anchors.size(0) // num_anchors
     if output.dim() == 3:
-        output = output.unsqueeze(0)
+        output = output.unsqueeze(0)  # 在第零维后 增加 1
     batch = output.size(0)
     assert (output.size(1) == (5 + num_classes) * num_anchors)
     h = output.size(2)
     w = output.size(3)
-    cls_anchor_dim = batch * num_anchors * h * w
+    cls_anchor_dim = batch * num_anchors * h * w  # 一共会有507 个 anchors
 
     # all_boxes = []
     output = output.view(batch * num_anchors, 5 + num_classes, h * w).transpose(0, 1).contiguous().view(5 + num_classes,

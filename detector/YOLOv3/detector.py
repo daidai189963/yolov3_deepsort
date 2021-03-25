@@ -33,19 +33,29 @@ class YOLOv3(object):
     def __call__(self, ori_img):
         # img to tensor
         assert isinstance(ori_img, np.ndarray), "input must be a numpy array!"
+        # 归一化 使数值为 0~1
         img = ori_img.astype(np.float) / 255.
-
+        # 使图片大小为 416*416
         img = cv2.resize(img, self.size)
+        # 将numpy转化为tensor
         img = torch.from_numpy(img).float().permute(2, 0, 1).unsqueeze(0)
 
-        # forward
+        # forward 前向计算
         with torch.no_grad():
-            img = img.to(self.device)
-            out_boxes = self.net(img)
+            img = img.to(self.device)  # 将tensor送进GPU
+            out_boxes = self.net(img)  # 就是执行darknet forward(self,x) 函数
+            # out_boxes =  { 0:
+            #               1:
+            #               2:
+            #              }
+            #   其中 out_boxes[0] = dic{'x': tensor[1,255,13,13],'a':tensor[6],'n':tensor[1]}
+            #       255 = 3*(5+80)
+            #       out_boxes[1] = dic{'x': tensor[1,255,26,26],'a':tensor[6],'n':tensor[1]}
+            # conf_thresh = 0.01    num_classes = 80
             boxes = get_all_boxes(out_boxes, self.conf_thresh, self.num_classes,
                                   use_cuda=self.use_cuda)  # batch size is 1
             # boxes = nms(boxes, self.nms_thresh)
-
+            # 开始非极大值抑制
             boxes = post_process(boxes, self.net.num_classes, self.conf_thresh, self.nms_thresh)[0].cpu()
             boxes = boxes[boxes[:, -2] > self.score_thresh, :]  # bbox xmin ymin xmax ymax
 
