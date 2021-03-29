@@ -2,6 +2,7 @@
 __pycache__/
 build/
 dataset
+VOC_dataset
 *.egg-info
 
 
